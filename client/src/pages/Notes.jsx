@@ -477,73 +477,342 @@
 //     </div>
 //   );
 // }
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// export default function Notes() {
+//   const [notes, setNotes] = useState([]);
+//   const [title, setTitle] = useState("");
+//   const [content, setContent] = useState("");
+
+//   const [selectedNote, setSelectedNote] = useState(null);
+//   const [editMode, setEditMode] = useState(false);
+
+//   const email = localStorage.getItem("email");
+
+//   // ---------------- FETCH ----------------
+//   const fetchNotes = async () => {
+//     if (!email) return;
+
+//     const res = await axios.get(
+//       `http://localhost:5001/api/notes?email=${email}`
+//     );
+
+//     setNotes(res.data);
+//   };
+
+//   useEffect(() => {
+//     fetchNotes();
+//   }, [email]);
+
+//   // ---------------- CREATE ----------------
+//   const createNote = async () => {
+//     if (!title || !content) return;
+
+//     await axios.post("http://localhost:5001/api/notes", {
+//       title,
+//       content,
+//       userEmail: email,
+//     });
+
+//     setTitle("");
+//     setContent("");
+//     fetchNotes();
+//   };
+
+//   // ---------------- DELETE ----------------
+//   const deleteNote = async (id) => {
+//     await axios.delete(`http://localhost:5001/api/notes/${id}`);
+//     setSelectedNote(null);
+//     fetchNotes();
+//   };
+
+//   // ---------------- UPDATE ----------------
+//   const updateNote = async () => {
+//     await axios.put(
+//       `http://localhost:5001/api/notes/${selectedNote._id}`,
+//       {
+//         title: selectedNote.title,
+//         content: selectedNote.content,
+//       }
+//     );
+
+//     setEditMode(false);
+//     fetchNotes();
+//   };
+
+//   return (
+//     <div className="p-6 bg-gray-50 min-h-screen">
+
+//       {/* CREATE NOTE */}
+//       <div className="max-w-2xl mx-auto bg-white p-4 rounded-xl shadow">
+//         <input
+//           className="border p-2 w-full mb-2 text-black rounded"
+//           placeholder="Title"
+//           value={title}
+//           onChange={(e) => setTitle(e.target.value)}
+//         />
+
+//         <textarea
+//           className="border p-2 w-full text-black rounded"
+//           placeholder="Content"
+//           value={content}
+//           onChange={(e) => setContent(e.target.value)}
+//         />
+
+//         <button
+//           onClick={createNote}
+//           className="bg-blue-600 text-white px-4 py-2 mt-3 rounded w-full"
+//         >
+//           Save Note
+//         </button>
+//       </div>
+
+//       {/* NOTES LIST */}
+//       <div className="max-w-3xl mx-auto mt-6 space-y-3">
+//         {notes.map((note) => (
+//           <div
+//             key={note._id}
+//             onClick={() => {
+//               setSelectedNote(note);
+//               setEditMode(false);
+//             }}
+//             className="bg-white p-4 border rounded-xl shadow cursor-pointer hover:shadow-lg transition"
+//           >
+//             <h3 className="font-bold text-lg">{note.title}</h3>
+//             <p className="text-gray-600 line-clamp-2">{note.content}</p>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* ================= FULL SCREEN MODAL ================= */}
+//       {selectedNote && (
+//         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+
+//           <div className="bg-white w-full h-full md:w-[90%] md:h-[90%] md:rounded-xl p-6 overflow-y-auto">
+
+//             {/* TOP BAR */}
+//             <div className="flex justify-between items-center border-b pb-3">
+//               <h2 className="text-xl font-bold">Your Note</h2>
+
+//               <button
+//                 onClick={() => setSelectedNote(null)}
+//                 className="text-red-600 font-bold"
+//               >
+//                 ✕
+//               </button>
+//             </div>
+
+//             {/* CONTENT */}
+//             <div className="mt-5 space-y-4">
+
+//               {editMode ? (
+//                 <>
+//                   <input
+//                     className="border p-2 w-full text-black rounded"
+//                     value={selectedNote.title}
+//                     onChange={(e) =>
+//                       setSelectedNote({
+//                         ...selectedNote,
+//                         title: e.target.value,
+//                       })
+//                     }
+//                   />
+
+//                   <textarea
+//                     className="border p-2 w-full text-black rounded h-64"
+//                     value={selectedNote.content}
+//                     onChange={(e) =>
+//                       setSelectedNote({
+//                         ...selectedNote,
+//                         content: e.target.value,
+//                       })
+//                     }
+//                   />
+//                 </>
+//               ) : (
+//                 <>
+//                   <h1 className="text-2xl font-bold">
+//                     {selectedNote.title}
+//                   </h1>
+
+//                   <p className="whitespace-pre-wrap text-gray-700">
+//                     {selectedNote.content}
+//                   </p>
+//                 </>
+//               )}
+
+//               {/* ACTION BUTTONS */}
+//               <div className="flex gap-3 pt-4">
+//                 <button
+//                   onClick={() => setEditMode(!editMode)}
+//                   className="bg-yellow-500 text-white px-4 py-2 rounded"
+//                 >
+//                   {editMode ? "Cancel" : "Edit"}
+//                 </button>
+
+//                 {editMode && (
+//                   <button
+//                     onClick={updateNote}
+//                     className="bg-green-600 text-white px-4 py-2 rounded"
+//                   >
+//                     Save
+//                   </button>
+//                 )}
+
+//                 <button
+//                   onClick={() => deleteNote(selectedNote._id)}
+//                   className="bg-red-600 text-white px-4 py-2 rounded"
+//                 >
+//                   Delete
+//                 </button>
+//               </div>
+
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//     </div>
+//   );
+// }
 
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Notes() {
   const [notes, setNotes] = useState([]);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const [openId, setOpenId] = useState(null);
-  const [editId, setEditId] = useState(null);
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+
+  // AI STATES
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const email = localStorage.getItem("email");
 
-  // ---------------- FETCH ----------------
+  // ---------------- FETCH NOTES ----------------
   const fetchNotes = async () => {
-    if (!email) return;
+    try {
+      if (!email) return;
 
-    const res = await axios.get(
-      `http://localhost:5001/api/notes?email=${email}`
-    );
+      const res = await axios.get(
+        `http://localhost:5001/api/notes?email=${email}`
+      );
 
-    setNotes(res.data);
+      setNotes(res.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   useEffect(() => {
     fetchNotes();
   }, [email]);
 
-  // ---------------- CREATE ----------------
+  // ---------------- CREATE NOTE ----------------
   const createNote = async () => {
     if (!title || !content) return;
 
-    await axios.post("http://localhost:5001/api/notes", {
-      title,
-      content,
-      userEmail: email,
-    });
+    try {
+      await axios.post("http://localhost:5001/api/notes", {
+        title,
+        content,
+        userEmail: email,
+        isAI: false,
+      });
 
-    setTitle("");
-    setContent("");
-    fetchNotes();
+      setTitle("");
+      setContent("");
+      fetchNotes();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // ---------------- DELETE ----------------
   const deleteNote = async (id) => {
-    await axios.delete(`http://localhost:5001/api/notes/${id}`);
-    setOpenId(null);
-    setEditId(null);
-    fetchNotes();
+    try {
+      await axios.delete(`http://localhost:5001/api/notes/${id}`);
+      setSelectedNote(null);
+      fetchNotes();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // ---------------- UPDATE ----------------
-  const updateNote = async (note) => {
-    await axios.put(`http://localhost:5001/api/notes/${note._id}`, {
-      title: note.title,
-      content: note.content,
-    });
+  const updateNote = async () => {
+    try {
+      await axios.put(
+        `http://localhost:5001/api/notes/${selectedNote._id}`,
+        {
+          title: selectedNote.title,
+          content: selectedNote.content,
+        }
+      );
 
-    setEditId(null);
-    fetchNotes();
+      setEditMode(false);
+      fetchNotes();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+  // ---------------- AI GENERATE NOTE ----------------
+  // const generateAINote = async () => {
+  //   if (!prompt || !email) return;
 
-      {/* CREATE NOTE */}
+  //   try {
+  //     setLoading(true);
+
+  //     const res = await axios.post(
+  //       "http://localhost:5001/api/notes/ai",
+  //       {
+  //         prompt,
+  //         userEmail: email,
+  //       }
+  //     );
+
+  //     fetchNotes(); // refresh list
+  //     setPrompt("");
+  //   } catch (err) {
+  //     console.log(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+const generateAINote = async () => {
+  if (!prompt || !email) return;
+
+  try {
+    setLoading(true);
+
+    const res = await axios.post(
+      "http://localhost:5001/api/notes/ai",
+      { prompt }
+    );
+
+    console.log("AI Response:", res.data);
+
+    // 🔥 INSTANT UI UPDATE (BEST UX)
+    setNotes((prev) => [res.data, ...prev]);
+
+    setPrompt("");
+  } catch (err) {
+    console.log("AI Error:", err.response?.data || err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+
+      {/* ================= CREATE NOTE ================= */}
       <div className="max-w-2xl mx-auto bg-white p-4 rounded-xl shadow">
         <input
           className="border p-2 w-full mb-2 text-black rounded"
@@ -567,99 +836,142 @@ export default function Notes() {
         </button>
       </div>
 
-      {/* NOTES LIST */}
-      <div className="max-w-3xl mx-auto space-y-3">
+      {/* ================= AI GENERATOR ================= */}
+      <div className="max-w-2xl mx-auto mt-6 bg-gradient-to-r from-indigo-500 to-purple-600 p-4 rounded-xl text-white shadow">
+        <h2 className="text-lg font-bold mb-2">✨ AI Note Generator</h2>
+
+        <textarea
+          className="w-full p-2 rounded text-black"
+          placeholder="Ask AI (e.g. Explain React Hooks)"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+        />
+
+        <button
+          onClick={generateAINote}
+          className="mt-3 bg-black text-white px-4 py-2 rounded w-full"
+        >
+          {loading ? "Generating..." : "Generate AI Note"}
+        </button>
+      </div>
+
+      {/* ================= NOTES LIST ================= */}
+      <div className="max-w-3xl mx-auto mt-6 space-y-3">
         {notes.map((note) => (
           <div
             key={note._id}
-            className="bg-white border rounded-xl shadow-sm p-4"
+            onClick={() => {
+              setSelectedNote(note);
+              setEditMode(false);
+            }}
+            className="bg-white p-4 border rounded-xl shadow cursor-pointer hover:shadow-lg transition"
           >
+            <h3 className="font-bold text-lg">
+              {note.title}
+              {note.isAI && (
+                <span className="ml-2 text-xs bg-purple-600 text-white px-2 py-1 rounded">
+                  AI
+                </span>
+              )}
+            </h3>
 
-            {/* CLICK TO OPEN */}
-            <div
-              onClick={() =>
-                setOpenId(openId === note._id ? null : note._id)
-              }
-              className="cursor-pointer"
-            >
-              <h3 className="font-bold text-lg">{note.title}</h3>
-              <p className="text-gray-600 text-sm line-clamp-2">
-                {note.content}
-              </p>
-            </div>
-
-            {/* EXPANDED VIEW */}
-            {openId === note._id && (
-              <div className="mt-3 border-t pt-3 space-y-3">
-
-                {/* EDIT MODE */}
-                {editId === note._id ? (
-                  <>
-                    <input
-                      className="border p-2 w-full text-black rounded"
-                      value={note.title}
-                      onChange={(e) => {
-                        setNotes((prev) =>
-                          prev.map((n) =>
-                            n._id === note._id
-                              ? { ...n, title: e.target.value }
-                              : n
-                          )
-                        );
-                      }}
-                    />
-
-                    <textarea
-                      className="border p-2 w-full text-black rounded"
-                      value={note.content}
-                      onChange={(e) => {
-                        setNotes((prev) =>
-                          prev.map((n) =>
-                            n._id === note._id
-                              ? { ...n, content: e.target.value }
-                              : n
-                          )
-                        );
-                      }}
-                    />
-
-                    <button
-                      onClick={() => updateNote(note)}
-                      className="bg-green-600 text-white px-3 py-1 rounded"
-                    >
-                      Save
-                    </button>
-                  </>
-                ) : (
-                  <p className="whitespace-pre-wrap text-gray-700">
-                    {note.content}
-                  </p>
-                )}
-
-                {/* ACTIONS */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      setEditId(editId === note._id ? null : note._id)
-                    }
-                    className="bg-yellow-500 text-white px-3 py-1 rounded"
-                  >
-                    {editId === note._id ? "Cancel" : "Edit"}
-                  </button>
-
-                  <button
-                    onClick={() => deleteNote(note._id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
-                </div>
-
-              </div>
-            )}
+            <p className="text-gray-600 line-clamp-2">
+              {note.content}
+            </p>
           </div>
         ))}
       </div>
+
+      {/* ================= FULL SCREEN MODAL ================= */}
+      {selectedNote && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+
+          <div className="bg-white w-full h-full md:w-[90%] md:h-[90%] md:rounded-xl p-6 overflow-y-auto">
+
+            {/* TOP BAR */}
+            <div className="flex justify-between items-center border-b pb-3">
+              <h2 className="text-xl font-bold">Note</h2>
+
+              <button
+                onClick={() => setSelectedNote(null)}
+                className="text-red-600 font-bold text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* CONTENT */}
+            <div className="mt-5 space-y-4">
+
+              {editMode ? (
+                <>
+                  <input
+                    className="border p-2 w-full text-black rounded"
+                    value={selectedNote.title}
+                    onChange={(e) =>
+                      setSelectedNote({
+                        ...selectedNote,
+                        title: e.target.value,
+                      })
+                    }
+                  />
+
+                  <textarea
+                    className="border p-2 w-full text-black rounded h-64"
+                    value={selectedNote.content}
+                    onChange={(e) =>
+                      setSelectedNote({
+                        ...selectedNote,
+                        content: e.target.value,
+                      })
+                    }
+                  />
+                </>
+              ) : (
+                <>
+                  <h1 className="text-2xl font-bold">
+                    {selectedNote.title}
+                  </h1>
+
+                  <p className="whitespace-pre-wrap text-gray-700">
+                    {selectedNote.content}
+                  </p>
+                </>
+              )}
+
+              {/* ACTION BUTTONS */}
+              <div className="flex gap-3 pt-4">
+
+                <button
+                  onClick={() => setEditMode(!editMode)}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded"
+                >
+                  {editMode ? "Cancel" : "Edit"}
+                </button>
+
+                {editMode && (
+                  <button
+                    onClick={updateNote}
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                  >
+                    Save
+                  </button>
+                )}
+
+                <button
+                  onClick={() => deleteNote(selectedNote._id)}
+                  className="bg-red-600 text-white px-4 py-2 rounded"
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
