@@ -61,18 +61,61 @@
 //   }
 // };
 
+// import Note from "../models/Note.js";
+
+// // CREATE NOTE
+// export const createNote = async (req, res) => {
+//   try {
+//     const { title, content, userEmail } = req.body;
+
+//     console.log("BODY:", req.body);
+
+//     if (!title || !content || !userEmail) {
+//       return res.status(400).json({
+//         message: "Missing fields (title/content/userEmail)",
+//       });
+//     }
+
+//     const note = await Note.create({
+//       title,
+//       content,
+//       userEmail,
+//       isAI: false,
+//     });
+
+//     res.status(201).json(note);
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ message: "Failed to create note" });
+//   }
+// };
+
+// // GET NOTES
+// export const getNotes = async (req, res) => {
+//   try {
+//     const { email } = req.query;
+
+//     const notes = await Note.find(
+//       email ? { userEmail: email } : {}
+//     ).sort({ createdAt: -1 });
+
+//     res.json(notes);
+//   } catch (err) {
+//     res.status(500).json({ message: "Failed to fetch notes" });
+//   }
+// };
+
+
 import Note from "../models/Note.js";
 
-// CREATE NOTE
+// ✅ CREATE NOTE
 export const createNote = async (req, res) => {
   try {
     const { title, content, userEmail } = req.body;
 
-    console.log("BODY:", req.body);
-
     if (!title || !content || !userEmail) {
       return res.status(400).json({
-        message: "Missing fields (title/content/userEmail)",
+        message: "Missing fields",
       });
     }
 
@@ -86,11 +129,11 @@ export const createNote = async (req, res) => {
     res.status(201).json(note);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to create note" });
+    res.status(500).json({ message: "Create failed" });
   }
 };
 
-// GET NOTES
+// ✅ GET NOTES
 export const getNotes = async (req, res) => {
   try {
     const { email } = req.query;
@@ -101,6 +144,36 @@ export const getNotes = async (req, res) => {
 
     res.json(notes);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch notes" });
+    res.status(500).json({ message: "Fetch failed" });
+  }
+};
+
+// ✅ UPDATE NOTE
+export const updateNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updated = await Note.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true }
+    );
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: "Update failed" });
+  }
+};
+
+// ✅ DELETE NOTE
+export const deleteNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await Note.findByIdAndDelete(id);
+
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Delete failed" });
   }
 };
