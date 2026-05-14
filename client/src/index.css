@@ -49,23 +49,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   @apply cursor-pointer opacity-60 hover:opacity-100;
 }
 
-input,
+/* input,
 textarea,
 select {
   color: black !important;
-}
+} */
 
 input::placeholder,
 textarea::placeholder {
   color: #6b7280 !important; /* optional gray placeholder */
 }
-input,
+/* input,
 textarea,
 select {
   @apply text-black;
-}
-input,
+} */
+/* input,
 textarea,
 select {
   color: #000;
-}
+} */

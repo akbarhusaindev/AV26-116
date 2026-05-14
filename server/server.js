@@ -67,6 +67,7 @@ import authRoutes from "./routes/authRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
 
 const app = express(); // ✅ MUST BE FIRST
 
@@ -103,6 +104,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/notes", noteRoutes);
+// app.use("/posts", postRoutes);
+app.use("/api/posts", postRoutes);
 
 // ---------------- ERROR HANDLERS ----------------
 app.use((_req, res) => {
