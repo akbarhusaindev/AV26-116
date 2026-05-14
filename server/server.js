@@ -63,19 +63,20 @@ import express from "express";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
 
+// --- ROUTES ---
 import authRoutes from "./routes/authRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import curriculumRoutes from "./routes/curriculumRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 
-const app = express(); // ✅ MUST BE FIRST
-
+const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ---------------- CORS ----------------
+// --- CORS ---
 const defaultOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
-
 const allowedOrigins = process.env.CLIENT_URL
   ? [...defaultOrigins, ...process.env.CLIENT_URL.split(",").map((o) => o.trim())]
   : defaultOrigins;
@@ -91,23 +92,24 @@ app.use(
   })
 );
 
-// ---------------- MIDDLEWARE ----------------
+// --- MIDDLEWARE ---
 app.use(express.json());
 
-// ---------------- HEALTH ----------------
+// --- HEALTH CHECK ---
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "SmartTask Pro API" });
 });
 
-// ---------------- ROUTES ----------------
+// --- MOUNT ROUTES ---
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/notes", noteRoutes);
-// app.use("/posts", postRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/curriculum", curriculumRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
-// ---------------- ERROR HANDLERS ----------------
+// --- ERROR HANDLING ---
 app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
@@ -117,9 +119,9 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
-// ---------------- START ----------------
+// --- START SERVER ---
 await connectDB();
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`✅ Server listening on port ${PORT}`);
 });

@@ -77,6 +77,10 @@ import Tasks from "./pages/Tasks.jsx";
 import Profile from "./pages/Profile.jsx";
 import Notes from "./pages/Notes.jsx";
 import PostPage from "./pages/PostPage.jsx"; // 🆕 Imported PostPage
+import CurriculumPage from "./pages/CurriculumPage";
+import AIChat from "./pages/AIChat.jsx";
+import Analytics from "./pages/Analytics"
+import InterviewRoom from "./pages/InterviewRoom";
 
 export default function App() {
   return (
@@ -97,8 +101,14 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/notes" element={<Notes />} />
+        <Route path="/ai-chat" element={<AIChat />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/community" element={<PostPage />} /> {/* 🆕 Community Route */}
+        <Route path="/curriculum" element={<CurriculumPage />} />
+        <Route path="/interview" element={<InterviewRoom />} />
+        
         <Route path="/profile" element={<Profile />} />
+
       </Route>
 
       {/* Fallback */}

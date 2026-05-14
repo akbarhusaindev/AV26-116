@@ -37,7 +37,7 @@ const postSchema = new mongoose.Schema(
     title: { type: String, required: true },
     description: { type: String, required: true },
     
-    // 👇 The images array to hold Cloudinary URLs
+    // Images array to hold Cloudinary URLs
     images: { 
       type: [String], 
       default: [] 
