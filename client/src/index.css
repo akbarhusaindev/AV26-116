@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: 248 250 252;
+  --surface-elevated: 255 255 255;
+  --border-subtle: 226 232 240;
+  --text: 15 23 42;
+  --muted: 100 116 139;
+}
+
+.dark {
+  --surface: 15 23 42;
+  --surface-elevated: 30 41 59;
+  --border-subtle: 51 65 85;
+  --text: 241 245 249;
+  --muted: 148 163 184;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-300;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.dark body {
+  @apply bg-slate-900 text-slate-100;
+}
+
+.glass-card {
+  @apply rounded-3xl border border-white/20 bg-white/70 shadow-glass backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-800/60;
+}
+
+.glass-panel {
+  @apply rounded-2xl border border-slate-200/80 bg-white/80 shadow-lg backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-800/70;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400;
+}
+
+.gradient-border-wrap {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(168, 85, 247, 0.5));
+  padding: 1px;
+  border-radius: 1.5rem;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  @apply cursor-pointer opacity-60 hover:opacity-100;
+}
