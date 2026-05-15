@@ -310,7 +310,6 @@
 // }
 
 
-
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "react-router-dom";
 import {
@@ -323,8 +322,8 @@ import {
   IoChatbubblesOutline,
   IoBookOutline, 
   IoVideocamOutline,
-  IoDocumentTextOutline,
-  IoTrendingUpOutline // ✅ Added the missing import right here!
+  IoDocumentTextOutline, // ✅ Only imported ONCE here
+  IoTrendingUpOutline 
 } from "react-icons/io5";
 import { HiOutlineSparkles } from "react-icons/hi2";
 
@@ -334,8 +333,10 @@ const links = [
   { to: "/notes", label: "Notes", icon: HiOutlineSparkles },
   { to: "/community", label: "Community", icon: IoGlobeOutline },
   { to: "/ai-chat", label: "AI Chat", icon: IoChatbubblesOutline },
+  { to: "/doc-qa", label: "Doc Chat", icon: IoDocumentTextOutline },
   { to: "/analytics", label: "Analytics", icon: IoTrendingUpOutline },
   { to: "/interview", label: "Mock Interview", icon: IoVideocamOutline },
+  
   { to: "/curriculum", label: "Curriculum", icon: IoBookOutline },
   { to: "/profile", label: "Profile", icon: IoPersonOutline },
 ];

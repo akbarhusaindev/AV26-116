@@ -71,6 +71,8 @@ import noteRoutes from "./routes/noteRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import curriculumRoutes from "./routes/curriculumRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import documentRoutes from "./routes/documentRoutes.js";
+
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -101,6 +103,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 // --- MOUNT ROUTES ---
+// --- MOUNT ROUTES ---
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/ai", aiRoutes);
@@ -108,6 +111,9 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/curriculum", curriculumRoutes);
 app.use("/api/analytics", analyticsRoutes);
+
+// ✅ YOU NEED TO ADD THIS LINE RIGHT HERE:
+app.use("/api/documents", documentRoutes);
 
 // --- ERROR HANDLING ---
 app.use((_req, res) => {
