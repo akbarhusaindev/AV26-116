@@ -1,0 +1,295 @@
+import fs from "fs";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+import mammoth from "mammoth";
+
+import groq from "../config/groq.js";
+// import DocumentModel from "../models/DocumentModel.js";
+import DocumentModels from "../models/DocumentModel.js";
+
+/*
+|--------------------------------------------------------------------------
+| CHUNK TEXT
+|--------------------------------------------------------------------------
+*/
+
+const chunkText = (text, chunkSize = 1000) => {
+  const chunks = [];
+
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push({
+      text: text.slice(i, i + chunkSize),
+      chunkIndex: chunks.length,
+    });
+  }
+
+  return chunks;
+};
+
+/*
+|--------------------------------------------------------------------------
+| UPLOAD DOCUMENT
+|--------------------------------------------------------------------------
+*/
+
+export const uploadDocument = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    const filePath = req.file.path;
+    const fileType = req.file.mimetype;
+
+    let extractedText = "";
+
+    /*
+    |--------------------------------------------------------------------------
+    | PDF
+    |--------------------------------------------------------------------------
+    */
+
+    if (fileType === "application/pdf") {
+      const data = new Uint8Array(fs.readFileSync(filePath));
+
+      const pdf = await pdfjsLib.getDocument({ data }).promise;
+
+      let text = "";
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+
+        const strings = content.items.map((item) => item.str);
+        text += strings.join(" ");
+      }
+
+      extractedText = text;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DOCX
+    |--------------------------------------------------------------------------
+    */
+
+    else if (
+      fileType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      const result = await mammoth.extractRawText({
+        path: filePath,
+      });
+
+      extractedText = result.value;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | INVALID FILE TYPE
+    |--------------------------------------------------------------------------
+    */
+
+    else {
+      return res.status(400).json({
+        success: false,
+        message: "Only PDF and DOCX supported",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHUNKING
+    |--------------------------------------------------------------------------
+    */
+
+    const chunks = chunkText(extractedText);
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE DOCUMENT
+    |--------------------------------------------------------------------------
+    */
+
+    const document = await DocumentModels.create({
+      userId: req.body.userId,
+      title: req.file.originalname,
+      fileUrl: filePath,
+      fileType,
+      extractedText,
+      chunks,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Document uploaded",
+      document,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| ASK DOCUMENT
+|--------------------------------------------------------------------------
+*/
+
+export const askDocument = async (req, res) => {
+  try {
+    const { documentId, question } = req.body;
+
+    const document = await DocumentModels.findById(documentId);
+
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        message: "Document not found",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SIMPLE RETRIEVAL
+    |--------------------------------------------------------------------------
+    */
+
+    const questionWords = question
+      .toLowerCase()
+      .replace(/[^\w\s]/gi, "")
+      .split(" ")
+      .filter((word) => word.length > 2);
+
+    const matchedChunks = document.chunks
+      .map((chunk) => {
+        const chunkText = chunk.text.toLowerCase();
+        let score = 0;
+
+        questionWords.forEach((word) => {
+          if (chunkText.includes(word)) {
+            score++;
+          }
+        });
+
+        return {
+          ...chunk.toObject(),
+          score,
+        };
+      })
+      .filter((chunk) => chunk.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    const context = matchedChunks
+      .map((chunk) => chunk.text)
+      .join("\n");
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROMPT
+    |--------------------------------------------------------------------------
+    */
+
+    const prompt = `
+You are a document assistant.
+
+Answer using the provided document context.
+
+If the answer exists in the document,
+answer clearly and concisely.
+
+If the answer is not found,
+say: I could not find this information in the document.
+
+DOCUMENT CONTEXT:
+${context}
+
+QUESTION:
+${question}
+`;
+
+    /*
+    |--------------------------------------------------------------------------
+    | GROQ AI RESPONSE
+    |--------------------------------------------------------------------------
+    */
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: "You are an adaptive AI tutor.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
+
+    const response = completion.choices[0]?.message?.content;
+
+    console.log(matchedChunks);
+
+    return res.status(200).json({
+      success: true,
+      response,
+      retrievedChunks: matchedChunks.length,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| GET DOCUMENTS
+|--------------------------------------------------------------------------
+*/
+
+export const getDocuments = async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    console.log("here is the route", userId);
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required",
+      });
+    }
+
+    const documents = await DocumentModels.find({ userId }).sort({
+      createdAt: -1,
+    });
+
+    return res.status(200).json({
+      success: true,
+      documents,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

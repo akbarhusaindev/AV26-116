@@ -81,7 +81,7 @@ import CurriculumPage from "./pages/CurriculumPage";
 import AIChat from "./pages/AIChat.jsx";
 import Analytics from "./pages/Analytics"
 import InterviewRoom from "./pages/InterviewRoom";
-import DocumentQA from "./pages/DocumentQA";
+import FileUpload from "./pages/FileUpload.jsx";
 
 export default function App() {
   return (
@@ -103,7 +103,7 @@ export default function App() {
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/notes" element={<Notes />} />
         <Route path="/ai-chat" element={<AIChat />} />
-        <Route path="/doc-qa" element={<DocumentQA />} />
+        <Route path="/doc-qa" element={<FileUpload />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/community" element={<PostPage />} /> {/* 🆕 Community Route */}
         <Route path="/curriculum" element={<CurriculumPage />} />

@@ -1,0 +1,45 @@
+import express from "express";
+import multer from "multer";
+
+import {
+  uploadDocument,
+  askDocument,
+  getDocuments,
+} from "../controllers/RagController.js";
+
+const ragRouter = express.Router();
+
+/*
+|--------------------------------------------------------------------------
+| MULTER CONFIGURATION
+|--------------------------------------------------------------------------
+*/
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+/*
+|--------------------------------------------------------------------------
+| ROUTES
+|--------------------------------------------------------------------------
+*/
+
+// Upload document
+ragRouter.post("/upload", upload.single("file"), uploadDocument);
+
+// Ask question from document
+ragRouter.post("/ask", askDocument);
+
+// Get all documents
+ragRouter.get("/documents", getDocuments);
+
+export default ragRouter;

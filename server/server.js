@@ -71,7 +71,10 @@ import noteRoutes from "./routes/noteRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import curriculumRoutes from "./routes/curriculumRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
-import documentRoutes from "./routes/documentRoutes.js";
+// import documentRoutes from "./routes/documentRoutes.js";
+import reminderRoutes from "./routes/reminderRoutes.js";
+import fileRoutes from "./routes/fileRoutes.js";
+// import ragRouter from "./routes/ragrouter.js";
 
 
 const app = express();
@@ -112,9 +115,14 @@ app.use("/api/posts", postRoutes);
 app.use("/api/curriculum", curriculumRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
-// ✅ YOU NEED TO ADD THIS LINE RIGHT HERE:
-app.use("/api/documents", documentRoutes);
 
+// app.use("/api/files", fileRoutes);
+app.use("/api/files", fileRoutes);
+
+// ✅ YOU NEED TO ADD THIS LINE RIGHT HERE:
+// app.use("/api/documents", documentRoutes);
+app.use("/api/reminders", reminderRoutes);
+// app.use("/rag", ragRouter);
 // --- ERROR HANDLING ---
 app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
